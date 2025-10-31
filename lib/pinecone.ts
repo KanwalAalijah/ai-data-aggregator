@@ -1,0 +1,126 @@
+import { Pinecone } from '@pinecone-database/pinecone';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize Pinecone
+let pineconeClient: Pinecone | null = null;
+
+export function getPineconeClient() {
+  if (!pineconeClient) {
+    pineconeClient = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+  }
+  return pineconeClient;
+}
+
+// Initialize Gemini for embeddings
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+export async function generateEmbedding(text: string): Promise<number[]> {
+  try {
+    // Truncate text to avoid exceeding the 36000 byte limit
+    // Safe limit: ~8000 characters (well below 36000 bytes)
+    const truncatedText = text.length > 8000 ? text.substring(0, 8000) : text;
+
+    const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+    const result = await model.embedContent(truncatedText);
+    return result.embedding.values;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    throw error;
+  }
+}
+
+export interface DocumentMetadata {
+  title: string;
+  link: string;
+  pubDate: string;
+  source: string;
+  type: 'article' | 'paper';
+  content: string;
+  authors?: string[];
+  categories?: string[];
+}
+
+export async function storeDocument(
+  id: string,
+  text: string,
+  metadata: DocumentMetadata
+) {
+  try {
+    const pc = getPineconeClient();
+    const indexName = process.env.PINECONE_INDEX_NAME || 'ai-data-aggregator';
+
+    // Check if index exists, if not provide instructions
+    const indexes = await pc.listIndexes();
+    const indexExists = indexes.indexes?.some((idx) => idx.name === indexName);
+
+    if (!indexExists) {
+      console.log(`Index "${indexName}" does not exist. Please create it first.`);
+      console.log(`You can create it with dimension 768 (for text-embedding-004)`);
+      throw new Error(`Pinecone index "${indexName}" not found`);
+    }
+
+    const index = pc.index(indexName);
+
+    // Generate embedding
+    const embedding = await generateEmbedding(text);
+
+    // Store in Pinecone
+    await index.upsert([
+      {
+        id,
+        values: embedding,
+        metadata: metadata as any,
+      },
+    ]);
+
+    console.log(`Stored document ${id} in Pinecone`);
+  } catch (error) {
+    console.error('Error storing document:', error);
+    throw error;
+  }
+}
+
+export async function queryDocuments(
+  query: string,
+  topK: number = 5
+): Promise<any[]> {
+  try {
+    const pc = getPineconeClient();
+    const indexName = process.env.PINECONE_INDEX_NAME || 'ai-data-aggregator';
+    const index = pc.index(indexName);
+
+    // Generate embedding for the query
+    const queryEmbedding = await generateEmbedding(query);
+
+    // Query Pinecone
+    const results = await index.query({
+      vector: queryEmbedding,
+      topK,
+      includeMetadata: true,
+    });
+
+    return results.matches || [];
+  } catch (error) {
+    console.error('Error querying documents:', error);
+    throw error;
+  }
+}
+
+export async function getAllDocuments(): Promise<any[]> {
+  try {
+    const pc = getPineconeClient();
+    const indexName = process.env.PINECONE_INDEX_NAME || 'ai-data-aggregator';
+    const index = pc.index(indexName);
+
+    // Get index stats
+    const stats = await index.describeIndexStats();
+    console.log('Index stats:', stats);
+
+    return [];
+  } catch (error) {
+    console.error('Error getting documents:', error);
+    throw error;
+  }
+}
