@@ -6,6 +6,7 @@ export interface WebDocument {
   pubDate: string;
   content: string;
   source: string;
+  categories?: string[];
 }
 
 // Static web pages to scrape
@@ -104,6 +105,7 @@ export async function scrapeWebPages(selectedSources?: string[]): Promise<WebDoc
           pubDate: new Date().toISOString(), // Use current date for static pages
           content: content.substring(0, 5000), // Limit content length
           source: page.source,
+          categories: ['AI Principles', 'Guidelines'],
         });
         console.log(`Successfully scraped ${page.source} (${content.length} chars)`);
       } else {
