@@ -1,19 +1,44 @@
 import { NextResponse } from 'next/server';
-import { scrapeRSSFeeds } from '@/lib/rss-scraper';
-import { fetchArxivPapers } from '@/lib/arxiv-fetcher';
+import { getAllDocuments } from '@/lib/pinecone';
 import { analyzeData } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    console.log('Fetching data for analytics...');
+    console.log('Fetching analytics from Pinecone database...');
 
-    // Fetch fresh data (cached for development)
-    const [articles, papers] = await Promise.all([
-      scrapeRSSFeeds(),
-      fetchArxivPapers(),
-    ]);
+    // Get all stored documents from Pinecone
+    const documents = await getAllDocuments();
+
+    // Convert Pinecone documents to articles and papers format
+    const articles: any[] = [];
+    const papers: any[] = [];
+
+    documents.forEach((doc: any) => {
+      const metadata = doc.metadata;
+      if (!metadata) return;
+
+      const item = {
+        title: metadata.title || 'No title',
+        link: metadata.link || '',
+        pubDate: metadata.pubDate || new Date().toISOString(),
+        content: metadata.content || '',
+        source: metadata.source || 'Unknown',
+        categories: metadata.categories || [],
+      };
+
+      if (metadata.type === 'paper') {
+        papers.push({
+          ...item,
+          authors: metadata.authors || [],
+        });
+      } else {
+        articles.push(item);
+      }
+    });
+
+    console.log(`Retrieved ${articles.length} articles and ${papers.length} papers from database`);
 
     // Analyze data
     const analytics = analyzeData(articles, papers);

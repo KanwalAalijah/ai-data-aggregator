@@ -18,35 +18,51 @@ const parser = new Parser({
 // AI-related RSS feeds
 const RSS_FEEDS = [
   {
+    id: 'techcrunch',
     url: 'https://techcrunch.com/category/artificial-intelligence/feed/',
     source: 'TechCrunch AI',
   },
   {
+    id: 'venturebeat',
     url: 'https://venturebeat.com/category/ai/feed/',
     source: 'VentureBeat AI',
   },
   {
+    id: 'mit',
     url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed',
     source: 'MIT Tech Review AI',
   },
   {
+    id: 'nvidia',
     url: 'https://blogs.nvidia.com/feed/',
     source: 'NVIDIA Blog',
   },
   {
+    id: 'openai',
     url: 'https://openai.com/blog/rss.xml',
     source: 'OpenAI Blog',
   },
   {
+    id: 'google',
     url: 'https://ai.googleblog.com/feeds/posts/default',
     source: 'Google AI Blog',
   },
+  {
+    id: 'guardian',
+    url: 'https://www.theguardian.com/technology/artificialintelligenceai/rss',
+    source: 'The Guardian AI',
+  },
 ];
 
-export async function scrapeRSSFeeds(): Promise<Article[]> {
+export async function scrapeRSSFeeds(selectedSources?: string[]): Promise<Article[]> {
   const allArticles: Article[] = [];
 
-  for (const feed of RSS_FEEDS) {
+  // Filter feeds based on selected sources
+  const feedsToScrape = selectedSources && selectedSources.length > 0
+    ? RSS_FEEDS.filter(feed => selectedSources.includes(feed.id))
+    : RSS_FEEDS;
+
+  for (const feed of feedsToScrape) {
     try {
       console.log(`Fetching from ${feed.source}...`);
       const feedData = await parser.parseURL(feed.url);

@@ -1,22 +1,40 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { scrapeRSSFeeds } from '@/lib/rss-scraper';
 import { fetchArxivPapers } from '@/lib/arxiv-fetcher';
+import { scrapeWebPages } from '@/lib/web-scraper';
+import { fetchNewsAPIArticles } from '@/lib/news-api-fetcher';
+import { fetchSemanticScholarPapers } from '@/lib/semantic-scholar-fetcher';
+import { fetchRedditPosts } from '@/lib/reddit-fetcher';
+import { fetchHackerNewsStories } from '@/lib/hackernews-fetcher';
 import { storeDocument } from '@/lib/pinecone';
 import { analyzeData } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    console.log('Starting data scraping...');
+    const body = await req.json();
+    const selectedSources = body.sources || [];
 
-    // Fetch articles and papers
-    const [articles, papers] = await Promise.all([
-      scrapeRSSFeeds(),
-      fetchArxivPapers(),
+    console.log('Starting data scraping...');
+    console.log('Selected sources:', selectedSources);
+
+    // Fetch from all sources
+    const [rssArticles, arxivPapers, webDocuments, newsAPIArticles, semanticScholarPapers, redditPosts, hackerNewsStories] = await Promise.all([
+      scrapeRSSFeeds(selectedSources),
+      fetchArxivPapers(selectedSources),
+      scrapeWebPages(selectedSources),
+      fetchNewsAPIArticles(selectedSources),
+      fetchSemanticScholarPapers(selectedSources),
+      fetchRedditPosts(selectedSources),
+      fetchHackerNewsStories(selectedSources),
     ]);
 
-    console.log(`Fetched ${articles.length} articles and ${papers.length} papers`);
+    // Combine all articles and papers
+    const articles = [...rssArticles, ...webDocuments, ...newsAPIArticles, ...redditPosts, ...hackerNewsStories];
+    const papers = [...arxivPapers, ...semanticScholarPapers];
+
+    console.log(`Fetched ${rssArticles.length} RSS articles, ${arxivPapers.length} ArXiv papers, ${semanticScholarPapers.length} Semantic Scholar papers, ${webDocuments.length} web documents, ${newsAPIArticles.length} News API articles, ${redditPosts.length} Reddit posts, ${hackerNewsStories.length} Hacker News stories`);
 
     // Store in Pinecone
     let storedCount = 0;

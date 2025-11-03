@@ -20,9 +20,16 @@ export interface TimelineData {
   total: number;
 }
 
+export interface ActiveSource {
+  source: string;
+  count: number;
+  lastPublished: string;
+}
+
 export interface AnalyticsData {
   totalArticles: number;
   totalPapers: number;
+  totalSocialPosts: number;
   topicTrends: TopicTrend[];
   sourceBreakdown: SourceBreakdown[];
   recentItems: any[];
@@ -31,6 +38,8 @@ export interface AnalyticsData {
     earliest: string;
     latest: string;
   };
+  mostActiveSourcesWeek: ActiveSource[];
+  mostActiveSourcesMonth: ActiveSource[];
 }
 
 // Common AI/ML keywords to track
@@ -112,7 +121,20 @@ export function analyzeData(
   const sourceCounts = new Map<string, number>();
 
   allItems.forEach((item) => {
-    sourceCounts.set(item.source, (sourceCounts.get(item.source) || 0) + 1);
+    // Group sources for cleaner pie chart
+    let source = item.source;
+    if (source.startsWith('News API -')) {
+      source = 'News API';
+    } else if (source.startsWith('Semantic Scholar -')) {
+      source = 'Semantic Scholar';
+    } else if (source.startsWith('ArXiv -')) {
+      source = 'ArXiv';
+    } else if (source.startsWith('Reddit -')) {
+      source = 'Reddit';
+    } else if (source === 'Hacker News') {
+      source = 'Hacker News';
+    }
+    sourceCounts.set(source, (sourceCounts.get(source) || 0) + 1);
   });
 
   const sourceBreakdown: SourceBreakdown[] = Array.from(
@@ -165,9 +187,56 @@ export function analyzeData(
     }))
     .sort((a, b) => a.month.localeCompare(b.month));
 
+  // Calculate total social posts (Reddit + Hacker News)
+  const totalSocialPosts = allItems.filter(
+    (item) => item.source.startsWith('Reddit -') || item.source === 'Hacker News'
+  ).length;
+
+  // Calculate most active sources (last week and last month)
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const weekItems = allItems.filter(item => new Date(item.pubDate) >= oneWeekAgo);
+  const monthItems = allItems.filter(item => new Date(item.pubDate) >= oneMonthAgo);
+
+  const calculateActiveSource = (items: any[]): ActiveSource[] => {
+    const sourceMap = new Map<string, { count: number; lastPublished: Date }>();
+
+    items.forEach(item => {
+      const pubDate = new Date(item.pubDate);
+      const existing = sourceMap.get(item.source);
+
+      if (!existing || pubDate > existing.lastPublished) {
+        sourceMap.set(item.source, {
+          count: (existing?.count || 0) + 1,
+          lastPublished: pubDate,
+        });
+      } else {
+        sourceMap.set(item.source, {
+          count: existing.count + 1,
+          lastPublished: existing.lastPublished,
+        });
+      }
+    });
+
+    return Array.from(sourceMap.entries())
+      .map(([source, data]) => ({
+        source,
+        count: data.count,
+        lastPublished: data.lastPublished.toISOString(),
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5); // Top 5 sources
+  };
+
+  const mostActiveSourcesWeek = calculateActiveSource(weekItems);
+  const mostActiveSourcesMonth = calculateActiveSource(monthItems);
+
   return {
     totalArticles: articles.length,
     totalPapers: papers.length,
+    totalSocialPosts,
     topicTrends,
     sourceBreakdown,
     recentItems,
@@ -176,5 +245,7 @@ export function analyzeData(
       earliest: earliestDate.toISOString(),
       latest: latestDate.toISOString(),
     },
+    mostActiveSourcesWeek,
+    mostActiveSourcesMonth,
   };
 }

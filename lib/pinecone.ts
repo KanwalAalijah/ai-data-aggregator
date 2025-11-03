@@ -114,11 +114,20 @@ export async function getAllDocuments(): Promise<any[]> {
     const indexName = process.env.PINECONE_INDEX_NAME || 'ai-data-aggregator';
     const index = pc.index(indexName);
 
-    // Get index stats
-    const stats = await index.describeIndexStats();
-    console.log('Index stats:', stats);
+    // Query with a zero vector to get all records
+    // This is a workaround since Pinecone doesn't have a "get all" method
+    const dimension = 768;
+    const zeroVector = new Array(dimension).fill(0);
 
-    return [];
+    const results = await index.query({
+      vector: zeroVector,
+      topK: 10000, // Get up to 10000 records
+      includeMetadata: true,
+    });
+
+    console.log(`Retrieved ${results.matches?.length || 0} documents from Pinecone`);
+
+    return results.matches || [];
   } catch (error) {
     console.error('Error getting documents:', error);
     throw error;

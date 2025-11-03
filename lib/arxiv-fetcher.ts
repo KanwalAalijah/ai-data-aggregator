@@ -19,27 +19,36 @@ const parser = new Parser({
 // ArXiv AI/ML categories
 const ARXIV_FEEDS = [
   {
+    id: 'arxiv-ai',
     url: 'http://export.arxiv.org/rss/cs.AI',
     source: 'ArXiv - AI',
   },
   {
+    id: 'arxiv-ml',
     url: 'http://export.arxiv.org/rss/cs.LG',
     source: 'ArXiv - Machine Learning',
   },
   {
+    id: 'arxiv-cl',
     url: 'http://export.arxiv.org/rss/cs.CL',
     source: 'ArXiv - Computation and Language',
   },
   {
+    id: 'arxiv-cv',
     url: 'http://export.arxiv.org/rss/cs.CV',
     source: 'ArXiv - Computer Vision',
   },
 ];
 
-export async function fetchArxivPapers(): Promise<ArxivPaper[]> {
+export async function fetchArxivPapers(selectedSources?: string[]): Promise<ArxivPaper[]> {
   const allPapers: ArxivPaper[] = [];
 
-  for (const feed of ARXIV_FEEDS) {
+  // Filter feeds based on selected sources
+  const feedsToFetch = selectedSources && selectedSources.length > 0
+    ? ARXIV_FEEDS.filter(feed => selectedSources.includes(feed.id))
+    : ARXIV_FEEDS;
+
+  for (const feed of feedsToFetch) {
     try {
       console.log(`Fetching from ${feed.source}...`);
       const feedData = await parser.parseURL(feed.url);
@@ -78,5 +87,6 @@ export async function fetchArxivPapers(): Promise<ArxivPaper[]> {
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   );
 
+  console.log(`Returning ${allPapers.length} total papers from ArXiv`);
   return allPapers;
 }
