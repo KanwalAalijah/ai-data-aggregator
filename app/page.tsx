@@ -300,11 +300,22 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(`Successfully scraped and stored ${data.data.storedCount} items!`);
-        // Reload full analytics from database instead of using scraped data
+        const { storedCount, articlesCount, papersCount } = data.data;
+        const totalFetched = articlesCount + papersCount;
+
+        if (storedCount < totalFetched) {
+          alert(`⚠️ Scraped ${totalFetched} items, but only stored ${storedCount} in database.\n\nSome items failed to store. Check Vercel logs for details.`);
+        } else {
+          alert(`✅ Successfully scraped and stored ${storedCount} items!`);
+        }
+
+        // Reload full analytics from database
         await loadAnalytics();
+
+        // Also reload predictions
+        await loadPredictions();
       } else {
-        alert('Error scraping data: ' + data.error);
+        alert('❌ Error scraping data: ' + data.error);
       }
     } catch (error) {
       console.error('Error scraping:', error);
