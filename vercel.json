@@ -6,10 +6,5 @@
     "app/api/predictions/route.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "PINECONE_API_KEY": "@pinecone_api_key",
-    "PINECONE_INDEX_NAME": "ai-data-aggregator",
-    "GEMINI_API_KEY": "@gemini_api_key"
   }
 }
