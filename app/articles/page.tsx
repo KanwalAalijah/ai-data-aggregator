@@ -97,34 +97,34 @@ export default function ArticlesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="border-b border-gray-800 bg-[#1a1a1a]">
-        <div className="mx-auto px-8 py-4">
+      <nav className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="mx-auto px-8 py-5">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <a href="/" className="flex items-center space-x-2 text-gray-400 hover:text-white transition">
+              <a href="/" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition">
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm">Back to Dashboard</span>
+                <span className="text-sm font-medium">Back to Dashboard</span>
               </a>
-              <h1 className="text-xl font-bold text-blue-400">Articles & Research Papers</h1>
+              <h1 className="text-xl font-bold text-gray-900">Articles & Research Papers</h1>
             </div>
-            <div className="flex space-x-8 text-sm">
-              <a href="/" className="text-gray-400 hover:text-white transition">
+            <div className="flex space-x-8 text-sm font-medium">
+              <a href="/" className="text-gray-500 hover:text-gray-900 transition">
                 Dashboard
               </a>
-              <span className="text-white">Articles</span>
+              <span className="text-blue-600 border-b-2 border-blue-600 pb-1">Articles</span>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="mx-auto px-8 py-8 max-w-7xl">
+      <main className="mx-auto px-8 py-10 max-w-7xl">
         {/* Header with Stats */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">All Articles & Papers</h2>
-          <p className="text-gray-400">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">All Articles & Papers</h2>
+          <p className="text-gray-600">
             {loading ? 'Loading...' : `${filteredArticles.length} of ${articles.length} items`}
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function ArticlesPage() {
               placeholder="Search articles by title, content, or source..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
             />
           </div>
 
@@ -149,7 +149,7 @@ export default function ArticlesPage() {
             <select
               value={selectedSource}
               onChange={(e) => setSelectedSource(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
+              className="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-sm"
             >
               {sources.map((source) => (
                 <option key={source} value={source}>
@@ -163,12 +163,12 @@ export default function ArticlesPage() {
         {/* Articles List */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-400">Loading articles...</div>
+            <div className="text-gray-600">Loading articles...</div>
           </div>
         ) : currentArticles.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-gray-400 mb-2">No articles found</p>
+              <p className="text-gray-600 mb-2">No articles found</p>
               <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function ArticlesPage() {
             {currentArticles.map((article) => (
               <div
                 key={article.id}
-                className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition"
+                className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 hover:shadow-md transition"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
@@ -185,33 +185,33 @@ export default function ArticlesPage() {
                       href={article.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xl font-semibold text-white hover:text-blue-400 transition inline-flex items-center gap-2 group"
+                      className="text-xl font-bold text-gray-900 hover:text-blue-600 transition inline-flex items-center gap-2 group"
                     >
                       {article.title}
-                      <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" />
+                      <ExternalLink className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition" />
                     </a>
                   </div>
                 </div>
 
                 {/* Metadata */}
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
-                  <div className="flex items-center gap-2 text-gray-400">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <Tag className="w-4 h-4" />
-                    <span className="text-blue-400">{article.source}</span>
+                    <span className="text-blue-600 font-medium">{article.source}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-400">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4" />
                     <span>{formatDate(article.date)}</span>
                   </div>
                   {article.authors && article.authors.length > 0 && (
-                    <div className="text-gray-400">
+                    <div className="text-gray-600">
                       <span className="text-gray-500">By:</span> {article.authors.join(', ')}
                     </div>
                   )}
                 </div>
 
                 {/* Content Preview */}
-                <p className="text-gray-400 text-sm leading-relaxed mb-3">
+                <p className="text-gray-600 text-sm leading-relaxed mb-3">
                   {truncateContent(article.content)}
                 </p>
 
@@ -221,7 +221,7 @@ export default function ArticlesPage() {
                     {article.categories.slice(0, 5).map((category, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-gray-800 text-gray-300 text-xs rounded"
+                        className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg font-medium border border-gray-200"
                       >
                         {category}
                       </span>
@@ -239,7 +239,7 @@ export default function ArticlesPage() {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white hover:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
             >
               Previous
             </button>
@@ -261,10 +261,10 @@ export default function ArticlesPage() {
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-2 rounded-lg transition ${
+                    className={`px-3 py-2 rounded-lg font-medium transition shadow-sm ${
                       currentPage === pageNum
                         ? 'bg-blue-600 text-white'
-                        : 'bg-[#1a1a1a] border border-gray-800 text-white hover:border-gray-700'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
                     }`}
                   >
                     {pageNum}
@@ -276,7 +276,7 @@ export default function ArticlesPage() {
             <button
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white hover:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
             >
               Next
             </button>
@@ -285,7 +285,7 @@ export default function ArticlesPage() {
 
         {/* Results Info */}
         {!loading && filteredArticles.length > 0 && (
-          <div className="mt-4 text-center text-sm text-gray-400">
+          <div className="mt-4 text-center text-sm text-gray-500">
             Showing {startIndex + 1}-{Math.min(endIndex, filteredArticles.length)} of{' '}
             {filteredArticles.length} articles
           </div>

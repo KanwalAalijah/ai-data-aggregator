@@ -196,7 +196,7 @@ export default function Dashboard() {
           color: '#6b7280',
         },
         grid: {
-          color: '#374151',
+          color: '#e5e7eb',
         },
       },
       x: {
@@ -234,6 +234,8 @@ export default function Dashboard() {
       tooltip: {
         backgroundColor: '#1f2937',
         padding: 12,
+        titleColor: '#fff',
+        bodyColor: '#fff',
       },
     },
     cutout: '70%',
@@ -370,29 +372,31 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="border-b border-gray-800 bg-[#1a1a1a]">
-        <div className="mx-auto px-8 py-4">
+      <nav className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="mx-auto px-8 py-5">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-blue-400">News Analytics Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900">News Analytics Dashboard</h1>
               <button
                 onClick={() => setShowSourceModal(true)}
                 disabled={scraping}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
               >
                 <RefreshCw className={`w-4 h-4 ${scraping ? 'animate-spin' : ''}`} />
                 <span>{scraping ? 'Scraping...' : 'Scrape Data'}</span>
               </button>
             </div>
-            <div className="flex space-x-8 text-sm">
+            <div className="flex space-x-8 text-sm font-medium">
               {['News Dashboard'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`transition ${
-                    activeTab === tab ? 'text-white' : 'text-gray-400 hover:text-white'
+                  className={`transition pb-1 border-b-2 ${
+                    activeTab === tab
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   {tab}
@@ -400,7 +404,7 @@ export default function Dashboard() {
               ))}
               <a
                 href="/articles"
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-500 hover:text-gray-700 transition pb-1 border-b-2 border-transparent hover:border-gray-300"
               >
                 Articles
               </a>
@@ -410,60 +414,60 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="mx-auto px-8 py-8 max-w-7xl">
+      <main className="mx-auto px-8 py-10 max-w-7xl">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-gray-400">Loading analytics...</div>
+            <div className="text-gray-600">Loading analytics...</div>
           </div>
         ) : (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
               {/* Total Articles */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm text-gray-400">Total Articles</h3>
-                  <TrendingUp className="w-4 h-4 text-gray-500" />
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Articles</h3>
+                  <TrendingUp className="w-5 h-5 text-blue-500" />
                 </div>
-                <p className="text-4xl font-bold mb-1">
+                <p className="text-4xl font-bold text-gray-900 mb-2">
                   {analytics?.totalArticles.toLocaleString() || '0'}
                 </p>
                 <p className="text-xs text-gray-500">Across all indexed sources</p>
               </div>
 
               {/* Research Papers */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm text-gray-400">Research Papers</h3>
-                  <Clock className="w-4 h-4 text-gray-500" />
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Research Papers</h3>
+                  <Clock className="w-5 h-5 text-green-500" />
                 </div>
-                <p className="text-4xl font-bold mb-1">
+                <p className="text-4xl font-bold text-gray-900 mb-2">
                   {analytics?.totalPapers.toLocaleString() || '0'}
                 </p>
                 <p className="text-xs text-gray-500">Peer-reviewed publications</p>
               </div>
 
               {/* Social Posts */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm text-gray-400">Social Posts</h3>
-                  <Users className="w-4 h-4 text-gray-500" />
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Social Posts</h3>
+                  <Users className="w-5 h-5 text-purple-500" />
                 </div>
-                <p className="text-4xl font-bold mb-1">
+                <p className="text-4xl font-bold text-gray-900 mb-2">
                   {analytics?.totalSocialPosts.toLocaleString() || '0'}
                 </p>
                 <p className="text-xs text-gray-500">From Reddit & Hacker News</p>
               </div>
 
               {/* Date Range */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm text-gray-400">Date Range</h3>
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Date Range</h3>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">Currently selected period</p>
-                <div className="flex items-center space-x-2 bg-[#0f0f0f] border border-gray-700 rounded px-3 py-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm">
+                <div className="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-700 font-medium">
                     {analytics?.dateRange
                       ? `${new Date(analytics.dateRange.earliest).toLocaleDateString('en-US', {
                           month: 'short',
@@ -481,11 +485,11 @@ export default function Dashboard() {
             </div>
 
             {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
               {/* Line Chart */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <h3 className="text-lg font-semibold mb-2">Articles Over Time</h3>
-                <p className="text-xs text-gray-500 mb-6">Monthly publication trends and growth.</p>
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Articles Over Time</h3>
+                <p className="text-sm text-gray-500 mb-6">Monthly publication trends and growth</p>
                 {lineChartData ? (
                   <div className="h-64">
                     <Line data={lineChartData} options={lineChartOptions} />
@@ -507,10 +511,10 @@ export default function Dashboard() {
               </div>
 
               {/* Donut Chart */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-                <h3 className="text-lg font-semibold mb-2">Total Data Sources</h3>
-                <p className="text-xs text-gray-500 mb-6">
-                  Distribution of articles by originating platform.
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Total Data Sources</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Distribution of articles by originating platform
                 </p>
                 {donutChartData ? (
                   <>
@@ -530,7 +534,7 @@ export default function Dashboard() {
                               ],
                             }}
                           ></div>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-600">
                             {source.source} ({source.percentage.toFixed(0)}%)
                           </span>
                         </div>
@@ -554,15 +558,15 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Bag of Words */}
-            <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800 mb-8">
-              <h3 className="text-lg font-semibold mb-2">Trending Keywords</h3>
-              <p className="text-xs text-gray-500 mb-4">Most frequently occurring keywords and topics.</p>
+            {/* Trending Keywords */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Trending Keywords</h3>
+              <p className="text-sm text-gray-500 mb-6">Most frequently occurring keywords and topics</p>
               <div className="flex flex-wrap gap-2">
                 {keywords.map((keyword, index) => (
                   <span
                     key={index}
-                    className="px-4 py-2 bg-[#2a2a2a] border border-gray-700 rounded text-sm hover:bg-[#3a3a3a] transition cursor-pointer"
+                    className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-medium hover:bg-gray-100 hover:border-gray-300 transition cursor-pointer"
                   >
                     {keyword}
                   </span>
@@ -573,55 +577,55 @@ export default function Dashboard() {
             {/* New Sections Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               {/* Most Active Sources */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-500" />
-                    <h3 className="text-lg font-semibold">Most Active Sources</h3>
+                    <h3 className="text-lg font-bold text-gray-900">Most Active Sources</h3>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setActiveSourcesTab('week')}
-                      className={`px-3 py-1 text-xs rounded transition ${
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition ${
                         activeSourcesTab === 'week'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-[#2a2a2a] text-gray-400 hover:text-white'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       Week
                     </button>
                     <button
                       onClick={() => setActiveSourcesTab('month')}
-                      className={`px-3 py-1 text-xs rounded transition ${
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition ${
                         activeSourcesTab === 'month'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-[#2a2a2a] text-gray-400 hover:text-white'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       Month
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mb-4">
+                <p className="text-sm text-gray-500 mb-4">
                   Top publishing sources in the last {activeSourcesTab === 'week' ? '7 days' : '30 days'}
                 </p>
                 <div className="space-y-3">
                   {analytics && (activeSourcesTab === 'week' ? analytics.mostActiveSourcesWeek : analytics.mostActiveSourcesMonth).length > 0 ? (
                     (activeSourcesTab === 'week' ? analytics.mostActiveSourcesWeek : analytics.mostActiveSourcesMonth).map((source, index) => (
-                      <div key={source.source} className="flex items-center justify-between p-3 bg-[#0f0f0f] rounded border border-gray-800">
+                      <div key={source.source} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 font-bold text-sm">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold text-sm">
                             {index + 1}
                           </div>
                           <div>
-                            <p className="text-sm font-medium">{source.source}</p>
+                            <p className="text-sm font-semibold text-gray-900">{source.source}</p>
                             <p className="text-xs text-gray-500">
                               Last published: {new Date(source.lastPublished).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-lg font-bold text-blue-400">{source.count}</p>
+                          <p className="text-lg font-bold text-blue-600">{source.count}</p>
                           <p className="text-xs text-gray-500">items</p>
                         </div>
                       </div>
@@ -635,35 +639,35 @@ export default function Dashboard() {
               </div>
 
               {/* Recent Additions Feed */}
-              <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
+              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="w-5 h-5 text-green-500" />
-                  <h3 className="text-lg font-semibold">Recent Additions</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Recent Additions</h3>
                 </div>
-                <p className="text-xs text-gray-500 mb-4">Latest items added to the database</p>
+                <p className="text-sm text-gray-500 mb-4">Latest items added to the database</p>
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                   {analytics && analytics.recentItems.length > 0 ? (
                     analytics.recentItems.slice(0, 10).map((item, index) => (
-                      <div key={index} className="p-3 bg-[#0f0f0f] rounded border border-gray-800 hover:border-gray-700 transition">
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <a
                               href={item.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm font-medium hover:text-blue-400 transition line-clamp-2"
+                              className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition line-clamp-2"
                             >
                               {item.title}
                             </a>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs text-gray-500">{item.source}</span>
-                              <span className="text-xs text-gray-600">•</span>
+                              <span className="text-xs text-gray-400">•</span>
                               <span className="text-xs text-gray-500">
                                 {new Date(item.pubDate).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
-                          <ExternalLink className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                          <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         </div>
                       </div>
                     ))
@@ -677,51 +681,51 @@ export default function Dashboard() {
             </div>
 
             {/* 2026 Trends Prediction */}
-            <div className="bg-gradient-to-br from-blue-950/30 to-purple-950/30 p-6 rounded-lg border border-blue-800/50 mb-8">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200 shadow-sm mb-8">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-6 h-6 text-blue-400" />
-                <h3 className="text-xl font-semibold">AI-Powered 2026 Trends Prediction</h3>
+                <Sparkles className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-bold text-gray-900">AI-Powered 2026 Trends Prediction</h3>
               </div>
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 Based on analysis of {prediction?.dataPoints.totalItems.toLocaleString()} items from our database
               </p>
               {predictionLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="flex items-center gap-3">
-                    <RefreshCw className="w-5 h-5 animate-spin text-blue-400" />
-                    <span className="text-gray-400">Analyzing trends and generating predictions...</span>
+                    <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+                    <span className="text-gray-600">Analyzing trends and generating predictions...</span>
                   </div>
                 </div>
               ) : prediction ? (
                 <div>
-                  <div className="bg-[#0f0f0f] p-4 rounded-lg border border-gray-800 mb-4">
-                    <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                       {prediction.prediction}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="bg-[#0f0f0f] p-3 rounded border border-gray-800">
+                    <div className="bg-white p-3 rounded-lg border border-gray-200">
                       <p className="text-xs text-gray-500 mb-1">Total Items</p>
-                      <p className="text-lg font-bold text-blue-400">{prediction.dataPoints.totalItems.toLocaleString()}</p>
+                      <p className="text-lg font-bold text-blue-600">{prediction.dataPoints.totalItems.toLocaleString()}</p>
                     </div>
-                    <div className="bg-[#0f0f0f] p-3 rounded border border-gray-800">
+                    <div className="bg-white p-3 rounded-lg border border-gray-200">
                       <p className="text-xs text-gray-500 mb-1">Growth Rate</p>
-                      <p className="text-lg font-bold text-green-400">{prediction.dataPoints.growthRate}</p>
+                      <p className="text-lg font-bold text-green-600">{prediction.dataPoints.growthRate}</p>
                     </div>
-                    <div className="bg-[#0f0f0f] p-3 rounded border border-gray-800">
+                    <div className="bg-white p-3 rounded-lg border border-gray-200">
                       <p className="text-xs text-gray-500 mb-1">Top Keyword</p>
-                      <p className="text-lg font-bold text-purple-400">{prediction.dataPoints.topKeyword}</p>
+                      <p className="text-lg font-bold text-purple-600">{prediction.dataPoints.topKeyword}</p>
                     </div>
-                    <div className="bg-[#0f0f0f] p-3 rounded border border-gray-800">
+                    <div className="bg-white p-3 rounded-lg border border-gray-200">
                       <p className="text-xs text-gray-500 mb-1">Generated</p>
-                      <p className="text-xs font-medium text-gray-400">
+                      <p className="text-xs font-medium text-gray-600">
                         {new Date(prediction.lastGenerated).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={loadPredictions}
-                    className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition flex items-center justify-center gap-2"
+                    className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm text-white font-medium transition shadow-sm flex items-center justify-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Regenerate Prediction
@@ -732,7 +736,7 @@ export default function Dashboard() {
                   <p className="text-gray-500 mb-4">Unable to generate predictions</p>
                   <button
                     onClick={loadPredictions}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm text-white font-medium transition shadow-sm"
                   >
                     Try Again
                   </button>
@@ -741,12 +745,12 @@ export default function Dashboard() {
             </div>
 
             {/* AI-Powered Analysis Summary */}
-            <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
-              <h3 className="text-lg font-semibold mb-3">AI-Powered Analysis Summary</h3>
-              <p className="text-xs text-gray-500 mb-4">
-                Key insights and actionable recommendations from recent data.
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">AI-Powered Analysis Summary</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Key insights and actionable recommendations from recent data
               </p>
-              <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
+              <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
                 <p>
                   This dashboard aggregates the latest AI research and news from multiple sources including
                   TechCrunch, VentureBeat, MIT Tech Review, NVIDIA, OpenAI, Google AI Blog, and ArXiv. The
@@ -773,33 +777,33 @@ export default function Dashboard() {
 
       {/* AI Assistant Chat Interface */}
       {chatOpen ? (
-        <div className={`fixed bg-[#1a1a1a] border border-gray-800 rounded-lg shadow-2xl flex flex-col transition-all duration-300 ${
+        <div className={`fixed bg-white border border-gray-200 rounded-xl shadow-2xl flex flex-col transition-all duration-300 ${
           chatExpanded
             ? 'inset-4 md:inset-8'
             : 'bottom-6 right-6 w-96 h-[500px]'
         }`}>
-          <div className="flex items-center justify-between p-4 border-b border-gray-800">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <h3 className="font-semibold">AI Assistant</h3>
+              <h3 className="font-semibold text-gray-900">AI Assistant</h3>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setChatExpanded(!chatExpanded)}
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-500 hover:text-gray-900 transition"
                 title={chatExpanded ? 'Minimize' : 'Expand'}
               >
                 {chatExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
-              <button onClick={() => setChatOpen(false)} className="text-gray-400 hover:text-white transition">
+              <button onClick={() => setChatOpen(false)} className="text-gray-500 hover:text-gray-900 transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-4">
                   Hello! I can help you analyze the AI research and news data. Ask me anything!
                 </p>
                 <div className="space-y-2 w-full">
@@ -808,7 +812,7 @@ export default function Dashboard() {
                       setInputMessage('Can you give me a summary of the latest AI articles?');
                       setTimeout(() => handleSendMessage(), 100);
                     }}
-                    className="w-full text-left text-xs text-gray-400 bg-[#2a2a2a] p-3 rounded hover:bg-[#3a3a3a] transition"
+                    className="w-full text-left text-xs text-gray-700 bg-white border border-gray-200 p-3 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition"
                   >
                     📊 Summarize the latest AI articles
                   </button>
@@ -817,7 +821,7 @@ export default function Dashboard() {
                       setInputMessage('What are the top trending topics in AI research?');
                       setTimeout(() => handleSendMessage(), 100);
                     }}
-                    className="w-full text-left text-xs text-gray-400 bg-[#2a2a2a] p-3 rounded hover:bg-[#3a3a3a] transition"
+                    className="w-full text-left text-xs text-gray-700 bg-white border border-gray-200 p-3 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition"
                   >
                     🔥 Show top trending topics
                   </button>
@@ -836,28 +840,28 @@ export default function Dashboard() {
                       className={`inline-block px-4 py-2 rounded-lg max-w-[80%] ${
                         msg.role === 'user'
                           ? 'bg-blue-600 text-white'
-                          : 'bg-[#2a2a2a] text-gray-200'
+                          : 'bg-white border border-gray-200 text-gray-900'
                       }`}
                     >
                       {msg.role === 'user' ? (
                         <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                       ) : (
-                        <div className="text-sm prose prose-invert prose-sm max-w-none">
+                        <div className="text-sm prose prose-gray prose-sm max-w-none">
                           <ReactMarkdown
                             components={{
                               p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
                               ul: ({ children }) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
                               ol: ({ children }) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
                               li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                              strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
+                              strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
                               em: ({ children }) => <em className="italic">{children}</em>,
                               code: ({ children }) => (
-                                <code className="bg-[#1a1a1a] px-1 py-0.5 rounded text-blue-300 text-xs">
+                                <code className="bg-gray-100 px-1 py-0.5 rounded text-blue-600 text-xs">
                                   {children}
                                 </code>
                               ),
                               pre: ({ children }) => (
-                                <pre className="bg-[#1a1a1a] p-2 rounded overflow-x-auto mb-2">
+                                <pre className="bg-gray-100 p-2 rounded overflow-x-auto mb-2">
                                   {children}
                                 </pre>
                               ),
@@ -873,26 +877,26 @@ export default function Dashboard() {
             )}
             {chatLoading && (
               <div className="text-left">
-                <div className="inline-block px-4 py-2 rounded-lg bg-[#2a2a2a]">
+                <div className="inline-block px-4 py-2 rounded-lg bg-white border border-gray-200">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
                       <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
                         style={{ animationDelay: '150ms' }}
                       ></div>
                       <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
                         style={{ animationDelay: '300ms' }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-400">Analyzing...</span>
+                    <span className="text-xs text-gray-600">Analyzing...</span>
                   </div>
                 </div>
               </div>
             )}
           </div>
-          <div className="p-4 border-t border-gray-800">
+          <div className="p-4 border-t border-gray-200 bg-white">
             <div className="flex space-x-2">
               <input
                 type="text"
@@ -900,13 +904,13 @@ export default function Dashboard() {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !chatLoading && handleSendMessage()}
                 placeholder="Ask me about the data..."
-                className="flex-1 bg-[#0f0f0f] border border-gray-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 disabled={chatLoading}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={chatLoading || !inputMessage.trim()}
-                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm text-white font-medium transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Send
               </button>
@@ -916,7 +920,7 @@ export default function Dashboard() {
       ) : (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition"
         >
           <MessageCircle className="w-6 h-6" />
         </button>
@@ -925,42 +929,42 @@ export default function Dashboard() {
       {/* Source Selection Modal */}
       {showSourceModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#1a1a1a] rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-gray-800">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-gray-200 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Select Data Sources</h2>
+              <h2 className="text-xl font-bold text-gray-900">Select Data Sources</h2>
               <button
                 onClick={() => setShowSourceModal(false)}
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-500 hover:text-gray-900 transition"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-600 mb-4">
               Choose which sources to scrape. Selected sources will be fetched and stored in the database.
             </p>
 
             {/* Select All */}
-            <div className="mb-4 pb-4 border-b border-gray-800">
-              <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded">
+            <div className="mb-4 pb-4 border-b border-gray-200">
+              <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg">
                 <input
                   type="checkbox"
                   checked={selectedSources.length === DATA_SOURCES.length}
                   onChange={() => toggleAllSources()}
-                  className="w-5 h-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                 />
-                <span className="font-semibold">Select All Sources</span>
-                <span className="text-sm text-gray-400">({selectedSources.length}/{DATA_SOURCES.length})</span>
+                <span className="font-semibold text-gray-900">Select All Sources</span>
+                <span className="text-sm text-gray-500">({selectedSources.length}/{DATA_SOURCES.length})</span>
               </label>
             </div>
 
             {/* News Sources */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-blue-400">News Sources</h3>
+                <h3 className="font-semibold text-blue-600">News Sources</h3>
                 <button
                   onClick={() => toggleAllSources('news')}
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 hover:text-gray-900 transition font-medium"
                 >
                   {DATA_SOURCES.filter(s => s.category === 'news').every(s => selectedSources.includes(s.id))
                     ? 'Deselect All'
@@ -971,15 +975,15 @@ export default function Dashboard() {
                 {DATA_SOURCES.filter((source) => source.category === 'news').map((source) => (
                   <label
                     key={source.id}
-                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded"
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={selectedSources.includes(source.id)}
                       onChange={() => toggleSource(source.id)}
-                      className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm">{source.name}</span>
+                    <span className="text-sm text-gray-700">{source.name}</span>
                   </label>
                 ))}
               </div>
@@ -988,10 +992,10 @@ export default function Dashboard() {
             {/* Research Sources */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-blue-400">Research Papers (ArXiv)</h3>
+                <h3 className="font-semibold text-blue-600">Research Papers (ArXiv)</h3>
                 <button
                   onClick={() => toggleAllSources('research')}
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 hover:text-gray-900 transition font-medium"
                 >
                   {DATA_SOURCES.filter(s => s.category === 'research').every(s => selectedSources.includes(s.id))
                     ? 'Deselect All'
@@ -1002,15 +1006,15 @@ export default function Dashboard() {
                 {DATA_SOURCES.filter((source) => source.category === 'research').map((source) => (
                   <label
                     key={source.id}
-                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded"
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={selectedSources.includes(source.id)}
                       onChange={() => toggleSource(source.id)}
-                      className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm">{source.name}</span>
+                    <span className="text-sm text-gray-700">{source.name}</span>
                   </label>
                 ))}
               </div>
@@ -1019,10 +1023,10 @@ export default function Dashboard() {
             {/* Social Media */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-blue-400">Social Media & Communities</h3>
+                <h3 className="font-semibold text-blue-600">Social Media & Communities</h3>
                 <button
                   onClick={() => toggleAllSources('social')}
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 hover:text-gray-900 transition font-medium"
                 >
                   {DATA_SOURCES.filter(s => s.category === 'social').every(s => selectedSources.includes(s.id))
                     ? 'Deselect All'
@@ -1033,15 +1037,15 @@ export default function Dashboard() {
                 {DATA_SOURCES.filter((source) => source.category === 'social').map((source) => (
                   <label
                     key={source.id}
-                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded"
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={selectedSources.includes(source.id)}
                       onChange={() => toggleSource(source.id)}
-                      className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm">{source.name}</span>
+                    <span className="text-sm text-gray-700">{source.name}</span>
                   </label>
                 ))}
               </div>
@@ -1050,10 +1054,10 @@ export default function Dashboard() {
             {/* AI Principles & Guidelines */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-blue-400">AI Principles & Guidelines</h3>
+                <h3 className="font-semibold text-blue-600">AI Principles & Guidelines</h3>
                 <button
                   onClick={() => toggleAllSources('principles')}
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 hover:text-gray-900 transition font-medium"
                 >
                   {DATA_SOURCES.filter(s => s.category === 'principles').every(s => selectedSources.includes(s.id))
                     ? 'Deselect All'
@@ -1064,15 +1068,15 @@ export default function Dashboard() {
                 {DATA_SOURCES.filter((source) => source.category === 'principles').map((source) => (
                   <label
                     key={source.id}
-                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded"
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg"
                   >
                     <input
                       type="checkbox"
                       checked={selectedSources.includes(source.id)}
                       onChange={() => toggleSource(source.id)}
-                      className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-sm">{source.name}</span>
+                    <span className="text-sm text-gray-700">{source.name}</span>
                   </label>
                 ))}
               </div>
@@ -1082,14 +1086,14 @@ export default function Dashboard() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowSourceModal(false)}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm transition"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleScrape}
                 disabled={selectedSources.length === 0}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 Scrape {selectedSources.length} Source{selectedSources.length !== 1 ? 's' : ''}
               </button>
@@ -1099,7 +1103,7 @@ export default function Dashboard() {
       )}
 
       {/* Footer */}
-      <footer className="text-center py-6 text-xs text-gray-500">
+      <footer className="text-center py-6 text-xs text-gray-400 bg-gray-50 border-t border-gray-200">
         {lastRefresh && <p>Last updated: {new Date(lastRefresh).toLocaleString()}</p>}
       </footer>
     </div>
