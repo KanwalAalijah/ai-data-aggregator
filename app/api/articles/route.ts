@@ -18,9 +18,10 @@ export async function GET() {
       includeMetadata: true,
     });
 
-    // Extract articles from the matches
+    // Extract articles from the matches (exclude papers)
     const articles = queryResponse.matches
-      ?.map((match: any) => ({
+      ?.filter((match: any) => match.metadata?.type !== 'paper') // Only include non-paper items
+      .map((match: any) => ({
         id: match.id,
         title: match.metadata?.title || 'No title',
         source: match.metadata?.source || 'Unknown',
@@ -29,6 +30,7 @@ export async function GET() {
         content: match.metadata?.content || match.metadata?.text || '',
         authors: match.metadata?.authors || [],
         categories: match.metadata?.categories || [],
+        type: match.metadata?.type || 'article',
       }))
       .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()) || [];
 

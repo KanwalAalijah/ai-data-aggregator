@@ -6,7 +6,7 @@ import { fetchNewsAPIArticles } from '@/lib/news-api-fetcher';
 import { fetchSemanticScholarPapers } from '@/lib/semantic-scholar-fetcher';
 import { fetchRedditPosts } from '@/lib/reddit-fetcher';
 import { fetchHackerNewsStories } from '@/lib/hackernews-fetcher';
-import { storeDocument } from '@/lib/pinecone';
+import { storeDocument, documentExists } from '@/lib/pinecone';
 import { analyzeData } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
@@ -37,13 +37,24 @@ export async function POST(req: NextRequest) {
     console.log(`Fetched ${rssArticles.length} RSS articles, ${arxivPapers.length} ArXiv papers, ${semanticScholarPapers.length} Semantic Scholar papers, ${webDocuments.length} web documents, ${newsAPIArticles.length} News API articles, ${redditPosts.length} Reddit posts, ${hackerNewsStories.length} Hacker News stories`);
 
     // Store in Pinecone
-    let storedCount = 0;
+    let newCount = 0;
+    let duplicateCount = 0;
+    let errorCount = 0;
 
     // Store articles
     for (const article of articles) {
       try {
         const id = `article-${Buffer.from(article.link).toString('base64').substring(0, 50)}`;
         const text = `${article.title}\n\n${article.content}`;
+
+        // Check if document already exists
+        const exists = await documentExists(id);
+
+        if (exists) {
+          duplicateCount++;
+          console.log(`Skipping duplicate article: ${article.title}`);
+          continue;
+        }
 
         await storeDocument(id, text, {
           title: article.title,
@@ -55,8 +66,10 @@ export async function POST(req: NextRequest) {
           categories: article.categories,
         });
 
-        storedCount++;
+        newCount++;
+        console.log(`Stored new article: ${article.title}`);
       } catch (error) {
+        errorCount++;
         console.error(`Error storing article: ${article.title}`, error);
       }
     }
@@ -66,6 +79,15 @@ export async function POST(req: NextRequest) {
       try {
         const id = `paper-${Buffer.from(paper.link).toString('base64').substring(0, 50)}`;
         const text = `${paper.title}\n\n${paper.content}`;
+
+        // Check if document already exists
+        const exists = await documentExists(id);
+
+        if (exists) {
+          duplicateCount++;
+          console.log(`Skipping duplicate paper: ${paper.title}`);
+          continue;
+        }
 
         await storeDocument(id, text, {
           title: paper.title,
@@ -78,8 +100,10 @@ export async function POST(req: NextRequest) {
           categories: paper.categories,
         });
 
-        storedCount++;
+        newCount++;
+        console.log(`Stored new paper: ${paper.title}`);
       } catch (error) {
+        errorCount++;
         console.error(`Error storing paper: ${paper.title}`, error);
       }
     }
@@ -87,13 +111,35 @@ export async function POST(req: NextRequest) {
     // Analyze data
     const analytics = analyzeData(articles, papers);
 
+    const totalFetched = articles.length + papers.length;
+    let message = '';
+
+    if (newCount > 0 && duplicateCount > 0) {
+      message = `Scraped ${totalFetched} items: ${newCount} new, ${duplicateCount} already in database`;
+    } else if (newCount > 0) {
+      message = `Scraped and stored ${newCount} new items`;
+    } else if (duplicateCount > 0) {
+      message = `Scraped ${totalFetched} items but all were already in database`;
+    } else {
+      message = 'No items were scraped';
+    }
+
+    if (errorCount > 0) {
+      message += ` (${errorCount} errors)`;
+    }
+
+    console.log(`Scraping complete: ${newCount} new, ${duplicateCount} duplicates, ${errorCount} errors`);
+
     return NextResponse.json({
       success: true,
-      message: `Scraped and stored ${storedCount} items`,
+      message,
       data: {
+        totalFetched,
         articlesCount: articles.length,
         papersCount: papers.length,
-        storedCount,
+        newCount,
+        duplicateCount,
+        errorCount,
         analytics,
       },
     });

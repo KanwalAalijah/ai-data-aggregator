@@ -13,7 +13,8 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { TrendingUp, Clock, Calendar, MessageCircle, X, RefreshCw, Users, Trophy, Sparkles, ExternalLink } from 'lucide-react';
+import { TrendingUp, Clock, Calendar, MessageCircle, X, RefreshCw, Users, Trophy, Sparkles, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 ChartJS.register(
   CategoryScale,
@@ -98,10 +99,11 @@ const DATA_SOURCES = [
 
 export default function Dashboard() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatExpanded, setChatExpanded] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [scraping, setScraping] = useState(false);
-  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [activeTab, setActiveTab] = useState('News Dashboard');
   const [chatLoading, setChatLoading] = useState(false);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -300,14 +302,24 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        const { storedCount, articlesCount, papersCount } = data.data;
-        const totalFetched = articlesCount + papersCount;
+        const { totalFetched, newCount, duplicateCount, errorCount } = data.data;
 
-        if (storedCount < totalFetched) {
-          alert(`⚠️ Scraped ${totalFetched} items, but only stored ${storedCount} in database.\n\nSome items failed to store. Check Vercel logs for details.`);
+        let message = '';
+        if (newCount > 0 && duplicateCount > 0) {
+          message = `✅ Scraped ${totalFetched} items:\n• ${newCount} new items stored\n• ${duplicateCount} already in database`;
+        } else if (newCount > 0) {
+          message = `✅ Successfully stored ${newCount} new items!`;
+        } else if (duplicateCount > 0) {
+          message = `ℹ️ Scraped ${totalFetched} items but all were already in database`;
         } else {
-          alert(`✅ Successfully scraped and stored ${storedCount} items!`);
+          message = '⚠️ No items were scraped';
         }
+
+        if (errorCount > 0) {
+          message += `\n\n⚠️ ${errorCount} items failed to store`;
+        }
+
+        alert(message);
 
         // Reload full analytics from database
         await loadAnalytics();
@@ -364,7 +376,7 @@ export default function Dashboard() {
         <div className="mx-auto px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-blue-400">Analytics Dashboard</h1>
+              <h1 className="text-xl font-bold text-blue-400">News Analytics Dashboard</h1>
               <button
                 onClick={() => setShowSourceModal(true)}
                 disabled={scraping}
@@ -375,7 +387,7 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="flex space-x-8 text-sm">
-              {['Dashboard', 'Analytics', 'Settings'].map((tab) => (
+              {['News Dashboard'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -761,15 +773,28 @@ export default function Dashboard() {
 
       {/* AI Assistant Chat Interface */}
       {chatOpen ? (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-[#1a1a1a] border border-gray-800 rounded-lg shadow-2xl flex flex-col">
+        <div className={`fixed bg-[#1a1a1a] border border-gray-800 rounded-lg shadow-2xl flex flex-col transition-all duration-300 ${
+          chatExpanded
+            ? 'inset-4 md:inset-8'
+            : 'bottom-6 right-6 w-96 h-[500px]'
+        }`}>
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <h3 className="font-semibold">AI Assistant</h3>
             </div>
-            <button onClick={() => setChatOpen(false)} className="text-gray-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setChatExpanded(!chatExpanded)}
+                className="text-gray-400 hover:text-white transition"
+                title={chatExpanded ? 'Minimize' : 'Expand'}
+              >
+                {chatExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+              </button>
+              <button onClick={() => setChatOpen(false)} className="text-gray-400 hover:text-white transition">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
@@ -814,7 +839,34 @@ export default function Dashboard() {
                           : 'bg-[#2a2a2a] text-gray-200'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                      {msg.role === 'user' ? (
+                        <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                      ) : (
+                        <div className="text-sm prose prose-invert prose-sm max-w-none">
+                          <ReactMarkdown
+                            components={{
+                              p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
+                              li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                              strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
+                              em: ({ children }) => <em className="italic">{children}</em>,
+                              code: ({ children }) => (
+                                <code className="bg-[#1a1a1a] px-1 py-0.5 rounded text-blue-300 text-xs">
+                                  {children}
+                                </code>
+                              ),
+                              pre: ({ children }) => (
+                                <pre className="bg-[#1a1a1a] p-2 rounded overflow-x-auto mb-2">
+                                  {children}
+                                </pre>
+                              ),
+                            }}
+                          >
+                            {msg.text}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}</>

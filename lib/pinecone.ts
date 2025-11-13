@@ -133,3 +133,18 @@ export async function getAllDocuments(): Promise<any[]> {
     throw error;
   }
 }
+
+export async function documentExists(id: string): Promise<boolean> {
+  try {
+    const pc = getPineconeClient();
+    const indexName = process.env.PINECONE_INDEX_NAME || 'ai-data-aggregator';
+    const index = pc.index(indexName);
+
+    // Fetch the document by ID
+    const result = await index.fetch([id]);
+    return result.records && Object.keys(result.records).length > 0;
+  } catch (error) {
+    console.error('Error checking if document exists:', error);
+    return false; // Assume it doesn't exist if there's an error
+  }
+}
