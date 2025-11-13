@@ -10,6 +10,7 @@ import { storeDocument, documentExists } from '@/lib/pinecone';
 import { analyzeData } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // 60 seconds for Vercel Pro, 10 for Hobby
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,15 +20,23 @@ export async function POST(req: NextRequest) {
     console.log('Starting data scraping...');
     console.log('Selected sources:', selectedSources);
 
-    // Fetch from all sources
+    // Validate that sources are provided
+    if (!selectedSources || selectedSources.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'No sources selected. Please select at least one source to scrape.',
+      }, { status: 400 });
+    }
+
+    // Fetch from all sources with individual error handling
     const [rssArticles, arxivPapers, webDocuments, newsAPIArticles, semanticScholarPapers, redditPosts, hackerNewsStories] = await Promise.all([
-      scrapeRSSFeeds(selectedSources),
-      fetchArxivPapers(selectedSources),
-      scrapeWebPages(selectedSources),
-      fetchNewsAPIArticles(selectedSources),
-      fetchSemanticScholarPapers(selectedSources),
-      fetchRedditPosts(selectedSources),
-      fetchHackerNewsStories(selectedSources),
+      scrapeRSSFeeds(selectedSources).catch(err => { console.error('RSS error:', err); return []; }),
+      fetchArxivPapers(selectedSources).catch(err => { console.error('ArXiv error:', err); return []; }),
+      scrapeWebPages(selectedSources).catch(err => { console.error('Web scraper error:', err); return []; }),
+      fetchNewsAPIArticles(selectedSources).catch(err => { console.error('News API error:', err); return []; }),
+      fetchSemanticScholarPapers(selectedSources).catch(err => { console.error('Semantic Scholar error:', err); return []; }),
+      fetchRedditPosts(selectedSources).catch(err => { console.error('Reddit error:', err); return []; }),
+      fetchHackerNewsStories(selectedSources).catch(err => { console.error('Hacker News error:', err); return []; }),
     ]);
 
     // Combine all articles and papers

@@ -127,9 +127,9 @@ export async function fetchSemanticScholarPapers(
       console.log(`Fetched ${papers.length} papers from ${queryConfig.source}`);
 
       // Add delay to respect rate limits (100 requests per 5 minutes)
-      // This gives us ~3 seconds between requests
-      if (queriesToFetch.length > 1) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+      // Reduced to 1 second for faster scraping
+      if (queriesToFetch.length > 1 && queriesToFetch.indexOf(queryConfig) < queriesToFetch.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     } catch (error) {
       console.error(`Error fetching ${queryConfig.source}:`, error);
