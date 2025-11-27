@@ -13,7 +13,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { TrendingUp, Clock, Calendar, MessageCircle, X, RefreshCw, Users, Trophy, Sparkles, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+import { TrendingUp, Clock, Calendar, MessageCircle, X, RefreshCw, Users, Trophy, Sparkles, ExternalLink, Maximize2, Minimize2, Info } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 ChartJS.register(
@@ -113,6 +113,7 @@ export default function Dashboard() {
   const [prediction, setPrediction] = useState<PredictionData | null>(null);
   const [predictionLoading, setPredictionLoading] = useState(false);
   const [activeSourcesTab, setActiveSourcesTab] = useState<'week' | 'month'>('week');
+  const [showAboutModal, setShowAboutModal] = useState(true);
 
   // Load analytics data
   const loadAnalytics = async () => {
@@ -161,7 +162,7 @@ export default function Dashboard() {
   // Line chart data - Articles Over Time
   const lineChartData = analytics?.timeline
     ? {
-        labels: analytics.timeline.map((item) => formatMonth(item.month)),
+        labels: analytics.timeline.map((item) => item.month),
         datasets: [
           {
             label: 'Total Items',
@@ -176,9 +177,23 @@ export default function Dashboard() {
       }
     : null;
 
+  // Calculate max value for better Y-axis scaling
+  const maxValue = analytics?.timeline
+    ? Math.max(...analytics.timeline.map((item) => item.total))
+    : 100;
+  const suggestedMax = Math.ceil(maxValue * 1.15); // Add 15% padding above max value
+
   const lineChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10,
+      },
+    },
     plugins: {
       legend: {
         display: false,
@@ -192,8 +207,12 @@ export default function Dashboard() {
     },
     scales: {
       y: {
+        beginAtZero: true,
+        suggestedMax: suggestedMax,
         ticks: {
           color: '#6b7280',
+          precision: 0,
+          padding: 8,
         },
         grid: {
           color: '#e5e7eb',
@@ -202,6 +221,10 @@ export default function Dashboard() {
       x: {
         ticks: {
           color: '#6b7280',
+          maxRotation: 0,
+          minRotation: 0,
+          padding: 8,
+          autoSkip: false,
         },
         grid: {
           display: false,
@@ -408,6 +431,13 @@ export default function Dashboard() {
               >
                 Articles
               </a>
+              <button
+                onClick={() => setShowAboutModal(true)}
+                className="text-gray-500 hover:text-gray-700 transition pb-1 border-b-2 border-transparent hover:border-gray-300 flex items-center gap-1"
+              >
+                <Info className="w-4 h-4" />
+                About
+              </button>
             </div>
           </div>
         </div>
@@ -488,10 +518,10 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
               {/* Line Chart */}
               <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Articles Over Time</h3>
-                <p className="text-sm text-gray-500 mb-6">Monthly publication trends and growth</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Articles Over Time - 2025</h3>
+                <p className="text-sm text-gray-500 mb-6">Monthly publication trends for 2025</p>
                 {lineChartData ? (
-                  <div className="h-64">
+                  <div className="h-80 w-full relative">
                     <Line data={lineChartData} options={lineChartOptions} />
                   </div>
                 ) : (
@@ -1096,6 +1126,130 @@ export default function Dashboard() {
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 Scrape {selectedSources.length} Source{selectedSources.length !== 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* About Modal */}
+      {showAboutModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Data Aggregator</h2>
+                <p className="text-sm text-gray-500">Full-Stack Analytics Dashboard</p>
+              </div>
+              <button
+                onClick={() => setShowAboutModal(false)}
+                className="text-gray-500 hover:text-gray-900 transition p-1 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Project Description */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                What This Project Does
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                This is a comprehensive AI news and research aggregation platform that automatically scrapes,
+                processes, and analyzes content from multiple sources including tech blogs, research papers,
+                and social media communities. The dashboard provides real-time analytics, trend visualization,
+                and AI-powered insights.
+              </p>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 mt-1">•</span>
+                  <span><strong>Multi-source Data Scraping:</strong> Aggregates content from TechCrunch, VentureBeat, MIT Tech Review, ArXiv, Reddit, and more</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 mt-1">•</span>
+                  <span><strong>Vector Database Storage:</strong> Uses Pinecone for semantic search and efficient data retrieval</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 mt-1">•</span>
+                  <span><strong>AI-Powered Analysis:</strong> Integrates with OpenAI for trend predictions and intelligent chat assistance</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 mt-1">•</span>
+                  <span><strong>Interactive Visualizations:</strong> Dynamic charts showing publication trends, source distribution, and keyword analysis</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 mt-1">•</span>
+                  <span><strong>Chat with Your Data:</strong> AI-powered chat assistant that lets you ask questions and gather insights from all scraped documents using RAG (Retrieval-Augmented Generation)</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Tech Stack */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-yellow-500" />
+                Tech Stack
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Frontend */}
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-3">Frontend</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Next.js 16', 'React 19', 'TypeScript', 'Tailwind CSS', 'Chart.js', 'Lucide Icons'].map((tech) => (
+                      <span key={tech} className="px-3 py-1 bg-white text-blue-700 text-xs font-medium rounded-full border border-blue-200">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Backend */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-3">Backend & APIs</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Next.js API Routes', 'REST APIs', 'Web Scraping', 'RSS Parsing', 'Data Processing'].map((tech) => (
+                      <span key={tech} className="px-3 py-1 bg-white text-green-700 text-xs font-medium rounded-full border border-green-200">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI & ML */}
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                  <h4 className="font-semibold text-purple-800 mb-3">AI & Machine Learning</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['OpenAI GPT-4', 'Embeddings', 'Vector Search', 'Semantic Analysis', 'NLP'].map((tech) => (
+                      <span key={tech} className="px-3 py-1 bg-white text-purple-700 text-xs font-medium rounded-full border border-purple-200">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Database & Infrastructure */}
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                  <h4 className="font-semibold text-orange-800 mb-3">Database & Infrastructure</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Pinecone', 'Vector Database', 'Vercel', 'Serverless', 'Environment Config'].map((tech) => (
+                      <span key={tech} className="px-3 py-1 bg-white text-orange-700 text-xs font-medium rounded-full border border-orange-200">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowAboutModal(false)}
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition"
+              >
+                Explore Dashboard
               </button>
             </div>
           </div>
