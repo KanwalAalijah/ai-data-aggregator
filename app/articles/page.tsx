@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, ExternalLink, Calendar, Tag, Filter, ArrowLeft } from 'lucide-react';
+import { Search, ExternalLink, Calendar, Tag, Filter } from 'lucide-react';
+import Navigation from '../components/Navigation';
 
 interface Article {
   id: string;
@@ -99,25 +100,7 @@ export default function ArticlesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="border-b border-gray-200 bg-white shadow-sm">
-        <div className="mx-auto px-8 py-5">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <a href="/" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition">
-                <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm font-medium">Back to Dashboard</span>
-              </a>
-              <h1 className="text-xl font-bold text-gray-900">Articles & Research Papers</h1>
-            </div>
-            <div className="flex space-x-8 text-sm font-medium">
-              <a href="/" className="text-gray-500 hover:text-gray-900 transition">
-                Dashboard
-              </a>
-              <span className="text-blue-600 border-b-2 border-blue-600 pb-1">Articles</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <main className="mx-auto px-8 py-10 max-w-7xl">

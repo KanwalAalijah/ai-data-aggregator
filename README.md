@@ -1,6 +1,6 @@
-# AI Research & News Analytics Dashboard
+# AI Knowledge Base
 
-A modern, real-time analytics dashboard that aggregates AI research papers and news articles from multiple sources, featuring interactive visualizations and an AI-powered chatbot using RAG (Retrieval Augmented Generation).
+A comprehensive knowledge aggregation platform that consolidates AI research papers and news articles from multiple sources, featuring interactive visualizations and an AI-powered chatbot using RAG (Retrieval Augmented Generation).
 
 ![Dashboard Preview](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)
@@ -49,7 +49,7 @@ A modern, real-time analytics dashboard that aggregates AI research papers and n
 1. **Clone the repository**
 ```bash
 git clone <your-repo-url>
-cd analytics-dashboard
+cd ai-knowledge-base
 ```
 
 2. **Install dependencies**
@@ -134,7 +134,7 @@ The dashboard displays:
 ## 📁 Project Structure
 
 ```
-analytics-dashboard/
+ai-knowledge-base/
 ├── app/
 │   ├── api/
 │   │   ├── analytics/route.ts    # Analytics data endpoint

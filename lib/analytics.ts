@@ -42,43 +42,147 @@ export interface AnalyticsData {
   mostActiveSourcesMonth: ActiveSource[];
 }
 
-// Common AI/ML keywords to track
-const AI_KEYWORDS = [
-  'GPT',
-  'LLM',
-  'Large Language Model',
-  'ChatGPT',
-  'Gemini',
-  'Claude',
-  'OpenAI',
-  'Anthropic',
-  'Deep Learning',
-  'Neural Network',
-  'Machine Learning',
-  'Computer Vision',
-  'Natural Language Processing',
-  'NLP',
-  'Transformer',
-  'Diffusion',
-  'Stable Diffusion',
-  'DALL-E',
-  'Generative AI',
-  'AI Agent',
-  'Reinforcement Learning',
-  'Multimodal',
+// Trending AI concepts and buzzwords to track
+// Focus on sophisticated, cutting-edge concepts (not mainstream terms)
+const TRENDING_AI_KEYWORDS = [
+  // Emerging AI Paradigms
+  'Agentic AI',
+  'Multimodal AI',
+  'Multimodal Generative AI',
+  'Small Language Model',
+  'Small Language Models',
+  'SLM',
+
+  // Advanced Capabilities
+  'AI Reasoning',
+  'Autonomous AI',
+  'Explainable AI',
+  'XAI',
+  'Trusted AI',
+
+  // Cutting-Edge Technical Approaches
+  'Retrieval Augmented Generation',
   'RAG',
-  'Vector Database',
-  'Fine-tuning',
   'Prompt Engineering',
+  'Fine-tuning',
+  'Fine Tuning',
+  'Transfer Learning',
+  'Transformer Architecture',
+  'Transformers',
+  'Diffusion Model',
+  'Diffusion Models',
+
+  // Governance & Ethics (Strategic Focus)
+  'AI Governance',
+  'AI Ethics',
+  'AI Regulation',
+  'AI Policy',
+  'AI Compliance',
+  'Shadow AI',
+  'AI Bias',
+  'AI Fairness',
+  'AI Transparency',
+  'Responsible AI',
+
+  // Infrastructure & Performance (Specialized)
+  'Custom Silicon',
+  'AI Chip',
+  'AI Chips',
+  'Edge AI',
+  'Federated Learning',
+  'Neuromorphic Computing',
+
+  // Environmental & Sustainability
+  'Environmental Footprint of AI',
+  'AI Sustainability',
+  'Green AI',
+  'AI Carbon Footprint',
+  'Energy Efficient AI',
+  'Sustainable AI',
+
+  // Specific Model Architectures
+  'GPT-4',
+  'GPT-5',
+  'Llama 3',
+  'Mistral',
+  'DALL-E',
+  'Stable Diffusion',
+  'Midjourney',
+
+  // Advanced Techniques & Methods
+  'Zero-shot Learning',
+  'Few-shot Learning',
+  'Chain of Thought',
+  'In-context Learning',
+  'Model Pruning',
+  'Quantization',
+  'Knowledge Distillation',
+
+  // Specialized Applications
+  'Computer Vision',
+  'Multimodal Learning',
+  'Speech Synthesis',
+  'Image Generation',
+  'Text-to-Image',
+  'Text-to-Video',
+  'Code Generation',
+  'Video Generation',
+
+  // Strategic Business Concepts
+  'AI Adoption',
+  'AI Integration',
+  'AI ROI',
+  'AI Strategy',
+  'AI Transformation',
+  'Enterprise AI',
+  'AI Platform',
+  'AI-First',
+
+  // Research & Innovation
+  'AI Innovation',
+  'AI Breakthrough',
+  'Frontier Model',
+  'Foundation Model',
+  'Mixture of Experts',
+  'MoE',
+
+  // Safety & Security
+  'AI Safety',
+  'AI Security',
+  'AI Alignment',
+  'AI Risk',
+  'Adversarial AI',
+  'AI Red Teaming',
+  'AI Hallucination',
+
+  // Advanced Data Concepts
+  'Synthetic Data',
+  'Data Augmentation',
+  'Vector Database',
+  'Vector Embeddings',
+  'Embedding',
+  'Semantic Search',
 ];
+
+// Normalize keywords for matching (lowercase, no special chars)
+const NORMALIZED_KEYWORDS = new Map(
+  TRENDING_AI_KEYWORDS.map(keyword => [
+    keyword.toLowerCase().replace(/[^a-z0-9\s]/g, ''),
+    keyword
+  ])
+);
 
 function extractKeywords(text: string): string[] {
   const lowerText = text.toLowerCase();
   const found: string[] = [];
 
-  for (const keyword of AI_KEYWORDS) {
-    if (lowerText.includes(keyword.toLowerCase())) {
-      found.push(keyword);
+  // Check for each trending keyword
+  for (const [normalized, original] of NORMALIZED_KEYWORDS.entries()) {
+    // Create a regex that matches the keyword as a whole phrase
+    const regex = new RegExp(`\\b${normalized.replace(/\s+/g, '\\s+')}\\b`, 'gi');
+
+    if (regex.test(lowerText)) {
+      found.push(original);
     }
   }
 
@@ -106,11 +210,18 @@ export function analyzeData(
     });
   });
 
+  // Keywords are already properly capitalized from TRENDING_AI_KEYWORDS
+  // No need for additional capitalization
+  const capitalizePhrase = (phrase: string): string => {
+    return phrase; // Return as-is since keywords are pre-formatted
+  };
+
   // Calculate topic trends
   const totalItems = allItems.length;
   const topicTrends: TopicTrend[] = Array.from(keywordCounts.entries())
+    .filter(([_, count]) => count >= 3) // Only show phrases that appear at least 3 times
     .map(([keyword, count]) => ({
-      keyword,
+      keyword: capitalizePhrase(keyword),
       count,
       percentage: (count / totalItems) * 100,
     }))
@@ -155,8 +266,8 @@ export function analyzeData(
     )
     .slice(0, 20);
 
-  // Calculate timeline distribution by month
-  const monthCounts = new Map<string, { articles: number; papers: number }>();
+  // Calculate timeline distribution for 2025 by month
+  const monthCounts2025 = new Map<string, { articles: number; papers: number }>();
   let earliestDate = new Date();
   let latestDate = new Date(0);
 
@@ -165,27 +276,38 @@ export function analyzeData(
     if (date < earliestDate) earliestDate = date;
     if (date > latestDate) latestDate = date;
 
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    const counts = monthCounts.get(monthKey) || { articles: 0, papers: 0 };
+    // Only include 2025 data
+    if (date.getFullYear() === 2025) {
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const counts = monthCounts2025.get(monthKey) || { articles: 0, papers: 0 };
 
-    if (item.type === 'article') {
-      counts.articles++;
-    } else {
-      counts.papers++;
+      if (item.type === 'article') {
+        counts.articles++;
+      } else {
+        counts.papers++;
+      }
+
+      monthCounts2025.set(monthKey, counts);
     }
-
-    monthCounts.set(monthKey, counts);
   });
 
-  // Convert to sorted array
-  const timeline: TimelineData[] = Array.from(monthCounts.entries())
-    .map(([month, counts]) => ({
-      month,
-      articles: counts.articles,
-      papers: counts.papers,
-      total: counts.articles + counts.papers,
-    }))
-    .sort((a, b) => a.month.localeCompare(b.month));
+  // Convert to sorted array with month names
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const timeline: TimelineData[] = Array.from(monthCounts2025.entries())
+    .map(([monthKey, counts]) => {
+      const monthIndex = parseInt(monthKey.split('-')[1]) - 1;
+      return {
+        month: monthNames[monthIndex],
+        articles: counts.articles,
+        papers: counts.papers,
+        total: counts.articles + counts.papers,
+      };
+    })
+    .sort((a, b) => {
+      const aIndex = monthNames.indexOf(a.month);
+      const bIndex = monthNames.indexOf(b.month);
+      return aIndex - bIndex;
+    });
 
   // Calculate total social posts (Reddit + Hacker News)
   const totalSocialPosts = allItems.filter(

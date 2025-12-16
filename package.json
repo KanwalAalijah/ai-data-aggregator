@@ -1,7 +1,7 @@
 {
-  "name": "analytics-dashboard",
+  "name": "ai-knowledge-base",
   "version": "1.0.0",
-  "description": "AI Research & News Analytics Dashboard with RAG-powered chatbot",
+  "description": "AI Knowledge Base - Comprehensive AI research and news aggregator with RAG-powered chatbot",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,6 +16,7 @@
     "cheerio": "^1.1.2",
     "lucide-react": "^0.552.0",
     "next": "16.0.1",
+    "pdfjs-dist": "^5.4.394",
     "react": "19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-datepicker": "^8.8.0",
